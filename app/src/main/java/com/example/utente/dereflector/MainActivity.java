@@ -6,10 +6,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -22,19 +25,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
     private static final int RESULT_LOAD_IMAGE = 1;
-    private static final int NOTIFY = 2;
+    private static final int INTERNET = 3;
     String picturePath = "";
-    private static int id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ImageView add = findViewById(R.id.add);
         Button send = findViewById(R.id.send);
-        id = 0;
         add.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Log.v(TAG, "Click on image!");
@@ -54,19 +58,15 @@ public class MainActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Log.v(TAG, "Click on button!");
-                Intent serviceIntent = new Intent();
-                serviceIntent.setAction("SendImage.class");
-                Bundle extras = serviceIntent.getExtras();
-                String key = "IMAGE";
-                String value = picturePath;
-                extras.putString(key, value);
-                //startService(serviceIntent);
-                String address = "";
-                int port = 0;
-                String data = value;
-                final String result = "";
-                final Client myClient = new Client(address, port, data, result);
-                myClient.execute();
+                try {
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, INTERNET);
+                    } else {
+                        startActivityForResult(new Intent(), INTERNET);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -85,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             picturePath = cursor.getString(columnIndex);
+            if(picturePath.compareTo("")!=0){
+                Log.v(TAG, "set"+picturePath);
+                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putString("image", picturePath); // here string is the value you want to save
+                editor.commit();
+            }
             cursor.close();
 
             ImageView imageView = (ImageView) findViewById(R.id.add);
@@ -95,8 +102,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        else if(requestCode == NOTIFY){
-            createNotification();
+        else if(requestCode == INTERNET){
+            request();
         }
     }
 
@@ -113,6 +120,39 @@ public class MainActivity extends AppCompatActivity {
         // hide the notification after its selected
         noti.flags |= Notification.FLAG_AUTO_CANCEL;
 
-        notificationManager.notify(0, noti);
+        notificationManager.notify(new Random().nextInt(), noti);
     }
+    public void request(){
+        String address = "";
+        int port = 0;
+        final String result = "";
+        final Client myClient = new Client(address, port, picturePath, result);
+        myClient.execute();
+        /*Intent serviceIntent = new Intent();
+        serviceIntent.setAction("com.example.utente.dereflector.SendImage");
+        Bundle extras = serviceIntent.getExtras();
+        String key = "IMAGE";
+        Log.v(TAG,key+" : "+picturePath);
+        extras.putString(key, picturePath);
+        startService(serviceIntent);*/
+    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        picturePath = settings.getString("image", "");
+        Log.v(TAG, "take: "+picturePath);
+        if(picturePath.compareTo("")!=0){
+            ImageView imageView = (ImageView) findViewById(R.id.add);
+            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            if(imageView.getDrawable() != null){
+                Button send = findViewById(R.id.send);
+                send.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
 }
+
