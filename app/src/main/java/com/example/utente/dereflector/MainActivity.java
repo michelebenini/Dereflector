@@ -39,6 +39,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView add = findViewById(R.id.add);
         Button send = findViewById(R.id.send);
+
+        if(savedInstanceState != null){
+            picturePath = savedInstanceState.getString("image");
+            ImageView imageView = (ImageView) findViewById(R.id.add);
+            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            if(imageView.getDrawable() != null){
+                send = findViewById(R.id.send);
+                send.setVisibility(View.VISIBLE);
+            }
+        }
         add.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Log.v(TAG, "Click on image!");
@@ -58,6 +68,10 @@ public class MainActivity extends AppCompatActivity {
         send.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Log.v(TAG, "Click on button!");
+                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
+                intent.putExtra("image",picturePath);
+                startActivity(intent);
+                /*
                 try {
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, INTERNET);
@@ -66,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }
+                }*/
             }
         });
     }
@@ -85,13 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             picturePath = cursor.getString(columnIndex);
-            if(picturePath.compareTo("")!=0){
-                Log.v(TAG, "set"+picturePath);
-                SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putString("image", picturePath); // here string is the value you want to save
-                editor.commit();
-            }
             cursor.close();
 
             ImageView imageView = (ImageView) findViewById(R.id.add);
@@ -138,20 +145,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        picturePath = settings.getString("image", "");
-        Log.v(TAG, "take: "+picturePath);
-        if(picturePath.compareTo("")!=0){
-            ImageView imageView = (ImageView) findViewById(R.id.add);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
-            if(imageView.getDrawable() != null){
-                Button send = findViewById(R.id.send);
-                send.setVisibility(View.VISIBLE);
-            }
-        }
+    @Override public void onSaveInstanceState(Bundle savedInstanceState) { // NOTE: with the implementation of this method inherited from // Activity, some widgets save their state in the bundle by default. // Once the user interface contains AT LEAST one non-autosaving // element, you should provide a custom implementation of // the method
+        savedInstanceState.putString("image", picturePath);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
 }
