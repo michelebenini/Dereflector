@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,7 +15,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Client extends AsyncTask<Void, Void, String> {
-
+    private final String TAG = "CLIENT";
     String dstAddress;
     int dstPort;
     String response = "";
@@ -32,10 +33,10 @@ public class Client extends AsyncTask<Void, Void, String> {
     @Override
     protected String doInBackground(Void... params) {
         Socket socket = null;
-
+        Log.v(TAG,"Do in background");
         try {
             socket = new Socket(dstAddress, dstPort);
-
+            Log.v(TAG,"Socket created");
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             InputStream inputStream = socket.getInputStream();
 
@@ -47,12 +48,13 @@ public class Client extends AsyncTask<Void, Void, String> {
             operation = data;
             byteArrayOutputStream.write(operation.getBytes());
             byteArrayOutputStream.write(img64.getBytes());
+            Log.v(TAG,"Data send");
 
             response = "";
             while ( inputStream.read(buffer) != -1) {
                 response += byteArrayOutputStream.toString("UTF-8");
             }
-
+            Log.v(TAG,"Received response : "+response);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -71,6 +73,7 @@ public class Client extends AsyncTask<Void, Void, String> {
                 }
             }
         }
+        Log.v(TAG,"Received response : "+response);
         return response;
     }
 

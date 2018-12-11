@@ -1,11 +1,13 @@
 package com.example.utente.dereflector;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -24,6 +26,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.util.Random;
 
@@ -31,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int INTERNET = 3;
+
     String picturePath = "";
 
     @Override
@@ -39,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ImageView add = findViewById(R.id.add);
         Button send = findViewById(R.id.send);
+        Button show = findViewById(R.id.show);
+
+        //startService(new Intent(this, BackgroundService.class));
 
         if(savedInstanceState != null){
             picturePath = savedInstanceState.getString("image");
@@ -67,20 +74,26 @@ public class MainActivity extends AppCompatActivity {
         });
         send.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                Log.v(TAG, "Click on button!");
+                /*Log.v(TAG, "Click on button!");
                 Intent intent = new Intent(MainActivity.this, ResultActivity.class);
                 intent.putExtra("image",picturePath);
                 startActivity(intent);
-                /*
+                */
                 try {
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, INTERNET);
                     } else {
-                        startActivityForResult(new Intent(), INTERNET);
+                        request();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                }*/
+                }
+            }
+        });
+        show.setOnClickListener(new View.OnClickListener(){
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ListImageActivity.class);
+                startActivity(intent);
             }
         });
     }
@@ -109,39 +122,18 @@ public class MainActivity extends AppCompatActivity {
             }
 
         }
-        else if(requestCode == INTERNET){
-            request();
-        }
+
     }
 
-    public void createNotification() {
-        // Prepare intent which is triggered if the
-        // notification is selected
-        Intent intent = new Intent(this, ResultActivity.class);
-        PendingIntent pIntent = PendingIntent.getActivity(this, (int) System.currentTimeMillis(), intent, 0);
-
-        // Build notification
-        // Actions are just fake
-        Notification noti = new Notification.Builder(this).setSmallIcon(R.drawable.icon).setContentTitle("IMAGE OBTAINED").build();
-        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        // hide the notification after its selected
-        noti.flags |= Notification.FLAG_AUTO_CANCEL;
-
-        notificationManager.notify(new Random().nextInt(), noti);
-    }
     public void request(){
-        String address = "";
-        int port = 0;
+        Log.v(TAG,"REQUEST SEND");
+        String address = "10.0.2.2";
+        int port = 1234;
         final String result = "";
         final Client myClient = new Client(address, port, picturePath, result);
         myClient.execute();
-        /*Intent serviceIntent = new Intent();
-        serviceIntent.setAction("com.example.utente.dereflector.SendImage");
-        Bundle extras = serviceIntent.getExtras();
-        String key = "IMAGE";
-        Log.v(TAG,key+" : "+picturePath);
-        extras.putString(key, picturePath);
-        startService(serviceIntent);*/
+        Toast.makeText(this, "Image Send!",Toast.LENGTH_LONG).show();
+
     }
 
 
