@@ -31,7 +31,7 @@ public class ResultActivity extends AppCompatActivity {
         final ImageView img=(ImageView)findViewById(R.id.img);
 
 
-        String picturePath = intent.getStringExtra("image");
+        String picturePath = intent.getStringExtra("name");
         final Bitmap origin = BitmapFactory.decodeFile(picturePath);
         final int w = origin.getWidth();
         int h = origin.getHeight();

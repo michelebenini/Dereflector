@@ -1,6 +1,7 @@
 package com.example.utente.dereflector;
 
 import android.app.Application;
+import android.app.ListActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -73,6 +74,7 @@ public class BackgroundService extends Service {
                 //fetching notifications from server
                 //if there is notifications then call this method
                 PushNotification();
+
             }
         }).start();
     }
@@ -82,7 +84,7 @@ public class BackgroundService extends Service {
         Context context = getApplicationContext();
         NotificationManager nm = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(context);
-        Intent notificationIntent = new Intent(context, MainActivity.class);
+        Intent notificationIntent = new Intent(context, ListActivity.class);
         PendingIntent contentIntent = PendingIntent.getActivity(context,0,notificationIntent,0);
 
         //set
@@ -95,5 +97,6 @@ public class BackgroundService extends Service {
 
         Notification notification = builder.build();
         nm.notify(id,notification);
+
     }
 }

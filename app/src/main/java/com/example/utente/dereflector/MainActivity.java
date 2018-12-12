@@ -92,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
         });
         show.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                Log.v(TAG,"SHOW clicked");
                 Intent intent = new Intent(MainActivity.this, ListImageActivity.class);
                 startActivity(intent);
             }
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
 
             ImageView imageView = (ImageView) findViewById(R.id.add);
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            Log.v(TAG,"picturepath : "+picturePath);
             if(imageView.getDrawable() != null){
                 Button send = findViewById(R.id.send);
                 send.setVisibility(View.VISIBLE);
