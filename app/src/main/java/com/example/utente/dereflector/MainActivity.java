@@ -18,7 +18,9 @@ import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -27,15 +29,27 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.app.Service;
 
 import java.util.Random;
+
+import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int INTERNET = 3;
 
+    private static final int RSS_JOB_ID = 1000;
+
     String picturePath = "";
+
+    String CHANNEL_ID = "prova";
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon2)
+            .setContentTitle("heyy")
+            .setContentText("hwwyyy")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +60,12 @@ public class MainActivity extends AppCompatActivity {
         Button show = findViewById(R.id.show);
 
         //startService(new Intent(this, BackgroundService.class));
+
+        Intent mServiceIntent =  new Intent();
+        mServiceIntent.setClass(this, BackgroundService.class);
+        startService(mServiceIntent);
+
+
 
         if(savedInstanceState != null){
             picturePath = savedInstanceState.getString("image");
@@ -89,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
     }
 
     @Override

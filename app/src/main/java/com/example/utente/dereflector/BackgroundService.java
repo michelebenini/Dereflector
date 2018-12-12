@@ -1,6 +1,7 @@
 package com.example.utente.dereflector;
 
 import android.app.Application;
+import android.app.IntentService;
 import android.app.ListActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -10,16 +11,38 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
+import android.support.v4.app.JobIntentService;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-public class BackgroundService extends Service {
+
+
+public class BackgroundService extends IntentService {
     private final String TAG = "SERVICE ";
     int id;
     private Handler mPeriodicEventHandler;
     private final int PERIODIC_EVENT_TIMEOUT = 5000;
 
+    String CHANNEL_ID = "prova";
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
+            .setSmallIcon(R.drawable.icon2)
+            .setContentTitle("heyy")
+            .setContentText("hwwyyy")
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+
+    @Override
+    protected void onHandleIntent(Intent workIntent) {
+        // Gets data from the incoming Intent
+        String dataString = workIntent.getDataString();
+
+
+    }
+
     public BackgroundService() {
+        super("backgrounService");
         id = 0;
         mPeriodicEventHandler = new Handler();
         mPeriodicEventHandler.postDelayed(doPeriodicTask, PERIODIC_EVENT_TIMEOUT);
@@ -28,10 +51,18 @@ public class BackgroundService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        onTaskRemoved(intent);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        for(int i=0;i<10;i++) {
+            // notificationId is a unique int for each notification that you must define
+            notificationManager.notify(i, mBuilder.build());
+        }
+        //onTaskRemoved(intent);
 
         return START_STICKY;
     }
+
     private Runnable doPeriodicTask = new Runnable()
     {
         public void run()
@@ -50,14 +81,20 @@ public class BackgroundService extends Service {
     public void onCreate() {
         startNotificationListener();
         super.onCreate();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(3, mBuilder.build());
+
     }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Intent restartServiceIntent = new Intent(getApplicationContext(),this.getClass());
-        restartServiceIntent.setPackage(getPackageName());
-        startService(restartServiceIntent);
-        super.onTaskRemoved(rootIntent);
+        //Intent restartServiceIntent = new Intent(getApplicationContext(),this.getClass());
+        //restartServiceIntent.setPackage(getPackageName());
+        //startService(restartServiceIntent);
+        //super.onTaskRemoved(rootIntent);
     }
 
     @Override
@@ -78,6 +115,7 @@ public class BackgroundService extends Service {
             }
         }).start();
     }
+
     public void PushNotification()
     {
         Log.v(TAG,"NOTIFICA ");
