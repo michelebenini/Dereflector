@@ -42,8 +42,8 @@ public class ListImageActivity extends AppCompatActivity {
     }
     private String[] makeDataset( ){
         String[]dataset = new String[2];
-        dataset[0] = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20181209-WA0005.jpg";
-        dataset[1] = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20181210-WA0001.jpg";
+        dataset[0] = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20180308-WA0001.jpeg";
+        dataset[1] = "/storage/emulated/0/WhatsApp/Media/WhatsApp Images/IMG-20180308-WA0001.jpeg";
         return  dataset;
     }
 
