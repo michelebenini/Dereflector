@@ -79,15 +79,7 @@ public class MainActivity extends AppCompatActivity {
                 intent.putExtra("image",picturePath);
                 startActivity(intent);
                 */
-                try {
-                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.INTERNET}, INTERNET);
-                    } else {
-                        request();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                request();
             }
         });
         show.setOnClickListener(new View.OnClickListener(){
@@ -129,8 +121,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void request(){
         Log.v(TAG,"REQUEST SEND");
-        String address = "10.0.2.2";
-        int port = 1234;
+        String address = "192.168.137.1"; // hotspot con pc, indirizzo gateway telefono
+        int port = 8888;
         final String result = "";
         final Client myClient = new Client(address, port, picturePath, result);
         myClient.execute();

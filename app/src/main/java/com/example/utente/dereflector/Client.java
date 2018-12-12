@@ -11,8 +11,11 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
 
 public class Client extends AsyncTask<Void, Void, String> {
     private final String TAG = "CLIENT";
@@ -32,28 +35,28 @@ public class Client extends AsyncTask<Void, Void, String> {
     }
     @Override
     protected String doInBackground(Void... params) {
-        Socket socket = null;
-        Log.v(TAG,"Do in background");
+        Socket socket = new Socket();
+        Log.v(TAG,"Do in background Server: "+dstAddress+":"+dstPort);
         try {
             socket = new Socket(dstAddress, dstPort);
             Log.v(TAG,"Socket created");
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            InputStream inputStream = socket.getInputStream();
+
+            ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+            ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
 
             String operation = "SendImage";
-            String img64 = toBase64(img);
-            byte[] buffer = new byte[img64.getBytes().length];
 
-            byteArrayOutputStream.write(operation.getBytes());
-            operation = data;
-            byteArrayOutputStream.write(operation.getBytes());
-            byteArrayOutputStream.write(img64.getBytes());
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            img.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] buffer = stream.toByteArray();
+
+            oos.writeObject(operation);
+            oos.flush();
+            oos.writeObject(buffer);
+            oos.flush();
             Log.v(TAG,"Data send");
 
-            response = "";
-            while ( inputStream.read(buffer) != -1) {
-                response += byteArrayOutputStream.toString("UTF-8");
-            }
+            response = (String)ois.readObject();
             Log.v(TAG,"Received response : "+response);
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
@@ -63,6 +66,8 @@ public class Client extends AsyncTask<Void, Void, String> {
             // TODO Auto-generated catch block
             e.printStackTrace();
             response = "IOException: " + e.toString();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         } finally {
             if (socket != null) {
                 try {
@@ -85,11 +90,6 @@ public class Client extends AsyncTask<Void, Void, String> {
 
     }
 
-    public String toBase64(Bitmap bitmap) {
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream .toByteArray();
-        return Base64.encodeToString(byteArray, Base64.DEFAULT);
-    }
+
 
 }
