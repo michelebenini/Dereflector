@@ -54,10 +54,9 @@ public class BackgroundService extends IntentService {
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
 
-        for(int i=0;i<10;i++) {
             // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(i, mBuilder.build());
-        }
+            notificationManager.notify(1, mBuilder.build());
+
         //onTaskRemoved(intent);
 
         return START_STICKY;
@@ -68,7 +67,7 @@ public class BackgroundService extends IntentService {
         public void run()
         {
             Log.v(TAG,"ESECUZIONE PERIODICA "+id);
-            startNotificationListener();
+            //startNotificationListener();
             id++;
             mPeriodicEventHandler.postDelayed(doPeriodicTask, PERIODIC_EVENT_TIMEOUT);
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -79,7 +78,7 @@ public class BackgroundService extends IntentService {
 
     @Override
     public void onCreate() {
-        startNotificationListener();
+        //startNotificationListener();
         super.onCreate();
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);

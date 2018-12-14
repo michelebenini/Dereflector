@@ -2,6 +2,7 @@ package com.example.utente.dereflector;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -10,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> {
     private String[] mDataset;
@@ -58,14 +61,13 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         holder.mTextView.setText(mDataset[position]);
-        holder.imView.setImageBitmap(BitmapFactory.decodeFile(mDataset[position]));
-
+        Picasso.get().load("file://" + mDataset[position]).into(holder.imView);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 String name = holder.mTextView.getText().toString();
-                Log.d(TAG, "onItemClick position: " +name );
-                Intent intent = new Intent(context, ResultActivity.class);
+                Intent intent = new Intent(context, ResultActivity2.class);
                 intent.putExtra("name",name);
                 context.startActivity(intent);
             }

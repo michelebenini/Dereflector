@@ -12,6 +12,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
@@ -31,9 +32,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.app.Service;
 
-import java.util.Random;
+
+import com.squareup.picasso.Picasso;
 
 import static java.security.AccessController.getContext;
 
@@ -42,43 +43,38 @@ public class MainActivity extends AppCompatActivity {
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int INTERNET = 3;
 
-    private static final int RSS_JOB_ID = 1000;
+    private static final String CHANNEL_ID = "ChannelID";
 
     String picturePath = "";
-
-    String CHANNEL_ID = "prova";
-    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon2)
-            .setContentTitle("heyy")
-            .setContentText("hwwyyy")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         createNotificationChannel();
+
         setContentView(R.layout.activity_main);
+
         ImageView add = findViewById(R.id.add);
         Button send = findViewById(R.id.send);
         Button show = findViewById(R.id.show);
 
-        //startService(new Intent(this, BackgroundService.class));
-
         Intent mServiceIntent =  new Intent();
         mServiceIntent.setClass(this, BackgroundService.class);
-        startService(mServiceIntent);
-
+        //startService(mServiceIntent);
 
 
         if(savedInstanceState != null){
             picturePath = savedInstanceState.getString("image");
             ImageView imageView = (ImageView) findViewById(R.id.add);
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
             if(imageView.getDrawable() != null){
                 send = findViewById(R.id.send);
                 send.setVisibility(View.VISIBLE);
             }
         }
+
         add.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Log.v(TAG, "Click on image!");
@@ -95,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
         send.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 /*Log.v(TAG, "Click on button!");
@@ -105,11 +102,13 @@ public class MainActivity extends AppCompatActivity {
                 request();
             }
         });
-        show.setOnClickListener(new View.OnClickListener(){
+
+        show.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG,"SHOW clicked");
+
                 Intent intent = new Intent(MainActivity.this, ListImageActivity.class);
                 startActivity(intent);
+
             }
         });
 
@@ -132,7 +131,9 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
 
             ImageView imageView = (ImageView) findViewById(R.id.add);
-            imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+
+            Picasso.get().load("file://" + picturePath).resize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight()).centerCrop().into(imageView);
+            //imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
             Log.v(TAG,"picturepath : "+picturePath);
             if(imageView.getDrawable() != null){
                 Button send = findViewById(R.id.send);
@@ -155,7 +156,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    @Override public void onSaveInstanceState(Bundle savedInstanceState) { // NOTE: with the implementation of this method inherited from // Activity, some widgets save their state in the bundle by default. // Once the user interface contains AT LEAST one non-autosaving // element, you should provide a custom implementation of // the method
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) { // NOTE: with the implementation of this method inherited from // Activity, some widgets save their state in the bundle by default. // Once the user interface contains AT LEAST one non-autosaving // element, you should provide a custom implementation of // the method
         savedInstanceState.putString("image", picturePath);
         super.onSaveInstanceState(savedInstanceState);
     }
@@ -175,5 +177,7 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
+
 }
 

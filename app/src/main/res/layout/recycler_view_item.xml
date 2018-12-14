@@ -17,4 +17,5 @@
       android:layout_gravity="center"
       android:padding="5dp"
       tools:text="@tools:sample/lorem" />
+
 </LinearLayout>
