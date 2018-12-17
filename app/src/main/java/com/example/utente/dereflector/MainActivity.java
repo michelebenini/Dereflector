@@ -1,6 +1,8 @@
 package com.example.utente.dereflector;
 
 import android.Manifest;
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -16,6 +18,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
@@ -36,12 +39,18 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
     private static final int RESULT_LOAD_IMAGE = 1;
     private static final int INTERNET = 3;
+
 
     private static final String CHANNEL_ID = "ChannelID";
 
@@ -51,10 +60,27 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        File mediaStorageDir = new File(Environment.getExternalStorageDirectory(), "Dereflection");
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("App", "failed to create directory");
+            }
+        }
+        File dirImg = new File(Environment.getExternalStorageDirectory(), "Dereflection/Images");
+        if (!dirImg.exists()) {
+            if (!dirImg.mkdirs()) {
+                Log.d("App", "failed to create directory");
+            }
+        }
+        File dirRes = new File(Environment.getExternalStorageDirectory(), "Dereflection/Result");
+        if (!dirRes.exists()) {
+            if (!dirRes.mkdirs()) {
+                Log.d("App", "failed to create directory");
+            }
+        }
+
         createNotificationChannel();
-
         setContentView(R.layout.activity_main);
-
         ImageView add = findViewById(R.id.add);
         Button send = findViewById(R.id.send);
         Button show = findViewById(R.id.show);
@@ -105,8 +131,22 @@ public class MainActivity extends AppCompatActivity {
 
         show.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
                 Intent intent = new Intent(MainActivity.this, ListImageActivity.class);
+                Log.v(TAG,"REQUEST SEND");
+
+                String result = "";
+                final Client myClient = new Client(2,"", result);
+                try {
+                    result = myClient.execute().get();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+
+                intent.putExtra("dataset",result);
+
                 startActivity(intent);
 
             }
@@ -146,12 +186,18 @@ public class MainActivity extends AppCompatActivity {
 
     public void request(){
         Log.v(TAG,"REQUEST SEND");
-        String address = "192.168.137.1"; // hotspot con pc, indirizzo gateway telefono
-        int port = 8888;
         final String result = "";
-        final Client myClient = new Client(address, port, picturePath, result);
-        myClient.execute();
-        Toast.makeText(this, "Image Send!",Toast.LENGTH_LONG).show();
+        final Client myClient = new Client(1,picturePath, result);
+        try {
+            if(myClient.execute().get().compareTo("TRUE")==0)
+                Toast.makeText(this, "Image Send!",Toast.LENGTH_LONG).show();
+            else
+                Toast.makeText(this, "Send error!",Toast.LENGTH_LONG).show();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 

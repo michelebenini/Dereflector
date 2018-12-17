@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
+
+import java.io.File;
 
 public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> {
     private String[] mDataset;
@@ -60,13 +63,17 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
+        File dirRes = new File(Environment.getExternalStorageDirectory(), "Dereflection/Result/"+mDataset[position]);
+        final String path = dirRes.getPath();
+        Log.v(TAG,"path : "+path);
         holder.mTextView.setText(mDataset[position]);
-        Picasso.get().load("file://" + mDataset[position]).into(holder.imView);
+
+        Picasso.get().load("file://"+ path).into(holder.imView);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                String name = holder.mTextView.getText().toString();
+                String name = path;
                 Intent intent = new Intent(context, ResultActivity2.class);
                 intent.putExtra("name",name);
                 context.startActivity(intent);
