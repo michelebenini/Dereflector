@@ -71,16 +71,37 @@ public class ListImageActivity extends AppCompatActivity {
             ds.add(scan.next());
         }
         int n = ds.size();
-        String[] dataset = new String[n];
         for (int i = 0; i < n; i++){
             String str = ds.get(i);
             Log.v(TAG,str);
-            if(checkfile(str)){
-                Log.v(TAG,"Add to dataset : "+str);
-                dataset[i] = str;
+            if(str.compareTo( "FALSE")==0){
+                break;
             }
-
+            checkfile(str);
         }
+        String pathI = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Images/";
+        File directoryI = new File(pathI);
+        File[] filesI = directoryI.listFiles();
+        String pathR = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Result/";
+        File directoryR = new File(pathR);
+        File[] filesR = directoryR.listFiles();
+        int f = filesI.length;
+        if(f > filesR.length) {
+            f = filesR.length;
+        }
+        String[] dataset = new String[f];
+        int k = 0;
+        for (int i = 0; i < filesI.length; i++)
+        {
+            for (int j = 0; j < filesR.length; j++) {
+                if (filesI[i].getName().compareTo(filesR[j].getName()) == 0) {
+                    Log.d(TAG, "Images: " + filesI[i].getName() + " Result: " + filesR[j].getName());
+                    dataset[k] = filesI[i].getName();
+                    k++;
+                }
+            }
+        }
+
         return  dataset;
     }
     private boolean checkfile(String s){
@@ -95,7 +116,7 @@ public class ListImageActivity extends AppCompatActivity {
         String res = new String();
         if(!fileI.exists()){
             Log.v(TAG,"IMAGE does not exist!");
-            Client myClient = new Client(3,s, "");
+            Client myClient = new Client(this,3,s, "");
             try {
                 res = myClient.execute().get();
                 done1 = true;
@@ -110,7 +131,7 @@ public class ListImageActivity extends AppCompatActivity {
 
         if(!fileR.exists()){
             Log.v(TAG,"RESULT does not exist!");
-            Client myClient = new Client(4,s, "");
+            Client myClient = new Client(this,4,s, "");
             try {
                 res = myClient.execute().get();
                 done2 = true;

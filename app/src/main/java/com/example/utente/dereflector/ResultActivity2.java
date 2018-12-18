@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -38,26 +39,37 @@ public class ResultActivity2 extends AppCompatActivity {
         setContentView(R.layout.new_activity_result);
 
         Intent intent = getIntent();
-        String picturePath = intent.getStringExtra("name");
+        String name = intent.getStringExtra("name");
+        String pathI = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Images/"+name;
+        String pathR = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Result/"+name;
 
         final ImageView img=(ImageView)findViewById(R.id.img);
-        final Bitmap src = BitmapFactory.decodeFile(picturePath);
+        final Bitmap src = BitmapFactory.decodeFile(pathI);
+        final Bitmap res = BitmapFactory.decodeFile(pathR);
 
         final SeekBar seekbar=(SeekBar)findViewById(R.id.seekBar);
         int width = (int) dipToPixels(this, 347);
         int heigth = (int) dipToPixels(this, 434);
+
         final Bitmap origin = Bitmap.createScaledBitmap( src, width , heigth, true);
-        final int w = origin.getWidth();
+        final Bitmap result = Bitmap.createScaledBitmap( res, width , heigth, true);
+
+        int minw = origin.getWidth();
+        if(minw > result.getWidth())
+            minw = result.getWidth();
         int h = origin.getHeight();
-        final Bitmap result = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        if(h > result.getHeight())
+            h = result.getHeight();
+        final int w = minw;
+
         start = 0;
         thresh = w*seekbar.getProgress()/100;
         end = w;
         image =  result.copy(origin.getConfig(),true);
 
-        //img.setImageBitmap(image);
-        Picasso.get().load("file://" + image).into(img);
-
+        //Picasso.get().load("file://" + image).into(img);
+        createImage(origin,result);
+        img.setImageBitmap(image);
 
         seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 

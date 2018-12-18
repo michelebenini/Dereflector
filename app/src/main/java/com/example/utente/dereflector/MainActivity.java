@@ -49,9 +49,6 @@ import static java.security.AccessController.getContext;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
     private static final int RESULT_LOAD_IMAGE = 1;
-    private static final int INTERNET = 3;
-
-
     private static final String CHANNEL_ID = "ChannelID";
 
     String picturePath = "";
@@ -87,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
         Intent mServiceIntent =  new Intent();
         mServiceIntent.setClass(this, BackgroundService.class);
-        //startService(mServiceIntent);
+        startService(mServiceIntent);
 
 
         if(savedInstanceState != null){
@@ -120,11 +117,6 @@ public class MainActivity extends AppCompatActivity {
 
         send.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
-                /*Log.v(TAG, "Click on button!");
-                Intent intent = new Intent(MainActivity.this, ResultActivity.class);
-                intent.putExtra("image",picturePath);
-                startActivity(intent);
-                */
                 request();
             }
         });
@@ -135,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.v(TAG,"REQUEST SEND");
 
                 String result = "";
-                final Client myClient = new Client(2,"", result);
+                final Client myClient = new Client(getApplicationContext(),2,"", result);
                 try {
                     result = myClient.execute().get();
                 } catch (ExecutionException e) {
@@ -187,10 +179,11 @@ public class MainActivity extends AppCompatActivity {
     public void request(){
         Log.v(TAG,"REQUEST SEND");
         final String result = "";
-        final Client myClient = new Client(1,picturePath, result);
+        final Client myClient = new Client(this,1,picturePath, result);
         try {
-            if(myClient.execute().get().compareTo("TRUE")==0)
-                Toast.makeText(this, "Image Send!",Toast.LENGTH_LONG).show();
+            if(myClient.execute().get().compareTo("TRUE")==0) {
+                Toast.makeText(this, "Image Send!", Toast.LENGTH_LONG).show();
+            }
             else
                 Toast.makeText(this, "Send error!",Toast.LENGTH_LONG).show();
         } catch (ExecutionException e) {
@@ -223,6 +216,7 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(channel);
         }
     }
+
 
 
 }

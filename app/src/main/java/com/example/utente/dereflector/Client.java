@@ -1,59 +1,63 @@
 package com.example.utente.dereflector;
 
 
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Intent;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Environment;
-import android.util.Base64;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
-import static android.content.Context.ACCOUNT_SERVICE;
 
 public class Client extends AsyncTask<Void, Void, String> {
     private final String TAG = "CLIENT";
 
     private final String dstAddress = "192.168.137.1"; // hotspot con pc, indirizzo gateway telefono
     private final int dstPort = 1234;
-    private final String user = "none";
+    private String user = "none";
     String response = "";
     String data;
     Bitmap img;
     String result;
+    Context context;
 
     int flag;
 
-    Client( int flag, String data, String result) {
+    Client(Context context, int flag, String data, String result) {
+        this.context = context;
         this.flag = flag;
-
         this.data = data;
         this.result = result;
+        this.user = getUser();
+    }
+    private String getUser(){
+       return "Jane.Doe";
     }
     @Override
     protected String doInBackground(Void... params) {
         Socket socket = new Socket();
         Log.v(TAG,"Do in background Server: "+dstAddress+":"+dstPort);
         try {
-            socket = new Socket(dstAddress, dstPort);
+            socket = new Socket();
+            socket.connect(new InetSocketAddress(dstAddress, dstPort), 1000);
+            socket.setSoTimeout(1000);
             Log.v(TAG,"Socket created");
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -105,13 +109,14 @@ public class Client extends AsyncTask<Void, Void, String> {
                     out.write(obj);
                     out.flush();
                     out.close();
+                    response = "TRUE";
 
                 } catch (Exception e) {
                     e.printStackTrace();
+                    response = "FALSE";
                 }
                 oos.close();
                 ois.close();
-                response = "TRUE";
             }else if(flag == 4) {
                 oos.writeObject("getResult");
                 oos.writeObject("localhost");
@@ -133,15 +138,30 @@ public class Client extends AsyncTask<Void, Void, String> {
                 oos.close();
                 ois.close();
                 response = "TRUE";
+            }else if(flag == 5) {
+                String operation = "ListNew";
+
+                oos.writeObject(operation);
+                oos.writeObject(user);
+                oos.flush();
+                Log.v(TAG, "Data send");
+
+                ArrayList<String> ls =(ArrayList<String>)ois.readObject();
+                if(ls == null){
+                    response = "FALSE";
+                }
+                else{
+                    response = ls.toString();
+                }
             }
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            response = "UnknownHostException: " + e.toString();
+            response = "FALSE";
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-            response = "IOException: " + e.toString();
+            response = "FALSE";
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } finally {

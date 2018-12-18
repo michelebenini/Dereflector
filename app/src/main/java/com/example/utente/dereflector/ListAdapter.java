@@ -60,7 +60,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, final int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
         File dirRes = new File(Environment.getExternalStorageDirectory(), "Dereflection/Result/"+mDataset[position]);
@@ -73,7 +73,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
             @Override
             public void onClick(View v) {
 
-                String name = path;
+                String name = mDataset[position];
                 Intent intent = new Intent(context, ResultActivity2.class);
                 intent.putExtra("name",name);
                 context.startActivity(intent);

@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.JobIntentService;
@@ -17,6 +18,12 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.concurrent.ExecutionException;
+
+import javax.xml.transform.Result;
 
 
 public class BackgroundService extends IntentService {
@@ -24,12 +31,12 @@ public class BackgroundService extends IntentService {
     int id;
     private Handler mPeriodicEventHandler;
     private final int PERIODIC_EVENT_TIMEOUT = 5000;
-
+    private Context CONTEXT;
     String CHANNEL_ID = "prova";
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.drawable.icon2)
-            .setContentTitle("heyy")
-            .setContentText("hwwyyy")
+            .setSmallIcon(R.drawable.icon)
+            .setContentTitle("New Image!")
+            .setContentText("A new image was elaborate!")
             .setPriority(NotificationCompat.PRIORITY_DEFAULT);
 
 
@@ -51,13 +58,7 @@ public class BackgroundService extends IntentService {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-            // notificationId is a unique int for each notification that you must define
-            notificationManager.notify(1, mBuilder.build());
-
-        //onTaskRemoved(intent);
+        Log.v(TAG,"onStartCommand");
 
         return START_STICKY;
     }
@@ -68,10 +69,13 @@ public class BackgroundService extends IntentService {
         {
             Log.v(TAG,"ESECUZIONE PERIODICA "+id);
             //startNotificationListener();
-            id++;
+            if(checkNewFile()){
+                Log.v(TAG,"NOTIFICA");
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(CONTEXT);
+                notificationManager.notify(3, mBuilder.build());
+            }
             mPeriodicEventHandler.postDelayed(doPeriodicTask, PERIODIC_EVENT_TIMEOUT);
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            PendingIntent pIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+
 
         }
     };
@@ -80,13 +84,8 @@ public class BackgroundService extends IntentService {
     public void onCreate() {
         //startNotificationListener();
         super.onCreate();
-
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-
-        // notificationId is a unique int for each notification that you must define
-        notificationManager.notify(3, mBuilder.build());
-
-    }
+        this.CONTEXT = this;
+            }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -135,5 +134,55 @@ public class BackgroundService extends IntentService {
         Notification notification = builder.build();
         nm.notify(id,notification);
 
+    }
+    private synchronized boolean checkNewFile(){
+        boolean done = false;
+        String result = "";
+        final Client myClient = new Client(CONTEXT,5,"", result);
+        try {
+            result = myClient.execute().get();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Log.v(TAG,"List: "+result);
+        if(result.compareTo("FALSE")==0 || result.length()<3){
+            return false;
+        }
+        result = result.substring(1,result.length()-1);
+        ArrayList<String> ds = new ArrayList<>();
+        Scanner scan = new Scanner(result).useDelimiter(", ");
+        while(scan.hasNext()){
+            ds.add(scan.next());
+        }
+        for(int i = 0; i < ds.size(); i++){
+            done = checkfile(ds.get(i));
+            if(done){
+                return done;
+            }
+        }
+        return done;
+    }
+    private boolean checkfile(String s){
+
+        File dirImg = new File(Environment.getExternalStorageDirectory(), "Dereflection/Images/");
+        File dirRes = new File(Environment.getExternalStorageDirectory(), "Dereflection/Result/");
+
+        //Get the text file
+        File fileI = new File(dirImg,s);
+        File fileR = new File(dirRes,s);
+
+        if(!fileI.exists()){
+            Log.v(TAG,"IMAGE does not exist!");
+            return true;
+        }
+
+        if(!fileR.exists()){
+            Log.v(TAG,"RESULT does not exist!");
+            return true;
+        }
+
+        return false;
     }
 }
