@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
+import static java.lang.Thread.sleep;
+
 
 public class ListImageActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
@@ -35,7 +37,10 @@ public class ListImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         ls = intent.getStringExtra("dataset");
-        ls = ls.substring(1,ls.length()-1);
+        if(ls==null)
+            ls="";
+        else
+            ls = ls.substring(1,ls.length()-1);
         Log.v(TAG,ls);
         setContentView(R.layout.activity_list_image);
 
@@ -57,28 +62,65 @@ public class ListImageActivity extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         // specify an adapter (see also next example)
-        String dataset[] = makeDataset();
+        final ArrayList<String> dataset = makeDataset();
 
         mAdapter = new ListAdapter(ListImageActivity.this,dataset);
 
         mRecyclerView.setAdapter(mAdapter);
+
+        new Thread(new Runnable() {
+            @Override
+
+            public void run() {
+
+                ArrayList<String> ds = new ArrayList<>();
+                Scanner scan = new Scanner(ls).useDelimiter(", ");
+                while(scan.hasNext()){
+                    ds.add(scan.next());
+                }
+                int n = ds.size();
+
+                for (int i = 0; i < n; i++){
+                    String str = ds.get(i);
+
+                    if(checkfile(str))
+                    {
+                        dataset.add(str);
+                        mAdapter.notifyItemInserted(dataset.size() - 1);
+                    }
+
+                    try
+                    {
+                    //Thread.sleep(1000);
+                    }
+                    catch(Exception e)
+                    {
+                    }
+
+
+                }
+
+                //mAdapter.notifyDataSetChanged();
+            }
+
+        }).start();
+
     }
 
-    private String[] makeDataset( ){
+    private ArrayList<String> makeDataset( ){
         ArrayList<String> ds = new ArrayList<>();
         Scanner scan = new Scanner(ls).useDelimiter(", ");
         while(scan.hasNext()){
             ds.add(scan.next());
         }
         int n = ds.size();
+
         for (int i = 0; i < n; i++){
             String str = ds.get(i);
-            Log.v(TAG,str);
-            if(str.compareTo( "FALSE")==0){
-                break;
-            }
-            checkfile(str);
+
+            //checkfile(str);
         }
+
         String pathI = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Images/";
         File directoryI = new File(pathI);
         File[] filesI = directoryI.listFiles();
@@ -89,14 +131,15 @@ public class ListImageActivity extends AppCompatActivity {
         if(f > filesR.length) {
             f = filesR.length;
         }
-        String[] dataset = new String[f];
+
+        ArrayList<String> dataset = new ArrayList<>();
         int k = 0;
         for (int i = 0; i < filesI.length; i++)
         {
             for (int j = 0; j < filesR.length; j++) {
                 if (filesI[i].getName().compareTo(filesR[j].getName()) == 0) {
                     Log.d(TAG, "Images: " + filesI[i].getName() + " Result: " + filesR[j].getName());
-                    dataset[k] = filesI[i].getName();
+                    dataset.add(filesI[i].getName());
                     k++;
                 }
             }
@@ -116,7 +159,7 @@ public class ListImageActivity extends AppCompatActivity {
         String res = new String();
         if(!fileI.exists()){
             Log.v(TAG,"IMAGE does not exist!");
-            Client myClient = new Client(this,3,s, "");
+            Client myClient = new Client(this,3, s, "");
             try {
                 res = myClient.execute().get();
                 done1 = true;
@@ -126,7 +169,7 @@ public class ListImageActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }else{
-            done1 = true;
+            done1 = false;
         }
 
         if(!fileR.exists()){
@@ -141,7 +184,7 @@ public class ListImageActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }else {
-            done2 = true;
+            done2 = false;
         }
 
         Log.v(TAG,"done 1 : "+done1+" done 2 "+done2);

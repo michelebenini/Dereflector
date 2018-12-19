@@ -147,7 +147,7 @@ public class BackgroundService extends IntentService {
             e.printStackTrace();
         }
         Log.v(TAG,"List: "+result);
-        if(result.compareTo("FALSE")==0 || result.length()<3){
+        if(result ==null || result.length()<3){
             return false;
         }
         result = result.substring(1,result.length()-1);

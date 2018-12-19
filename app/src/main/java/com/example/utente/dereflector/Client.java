@@ -57,7 +57,7 @@ public class Client extends AsyncTask<Void, Void, String> {
         try {
             socket = new Socket();
             socket.connect(new InetSocketAddress(dstAddress, dstPort), 1000);
-            socket.setSoTimeout(1000);
+            //socket.setSoTimeout(1000);
             Log.v(TAG,"Socket created");
 
             ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
@@ -93,8 +93,12 @@ public class Client extends AsyncTask<Void, Void, String> {
                 Log.v(TAG, "Data send");
 
                 ArrayList<String> ls =(ArrayList<String>)ois.readObject();
-
-                response = ls.toString();
+                if(ls == null){
+                    response = null;
+                }
+                else {
+                    response = ls.toString();
+                }
             }else if(flag == 3) {
                 oos.writeObject("getImage");
                 oos.writeObject("localhost");
@@ -148,7 +152,7 @@ public class Client extends AsyncTask<Void, Void, String> {
 
                 ArrayList<String> ls =(ArrayList<String>)ois.readObject();
                 if(ls == null){
-                    response = "FALSE";
+                    response = null;
                 }
                 else{
                     response = ls.toString();

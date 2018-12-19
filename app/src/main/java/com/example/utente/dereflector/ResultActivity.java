@@ -4,6 +4,7 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -24,7 +25,7 @@ import android.widget.SeekBar;
 
 import com.squareup.picasso.Picasso;
 
-public class ResultActivity2 extends AppCompatActivity {
+public class ResultActivity extends AppCompatActivity {
     Bitmap image;
     int start;
     int end;
@@ -43,16 +44,26 @@ public class ResultActivity2 extends AppCompatActivity {
         String pathI = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Images/"+name;
         String pathR = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Result/"+name;
 
+
         final ImageView img=(ImageView)findViewById(R.id.img);
-        final Bitmap src = BitmapFactory.decodeFile(pathI);
-        final Bitmap res = BitmapFactory.decodeFile(pathR);
+        //final Bitmap src = BitmapFactory.decodeFile(pathI);
+        //final Bitmap res = BitmapFactory.decodeFile(pathR);
+
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(getResources(), R.id.img, options);
+        int imageHeight = options.outHeight;
+        int imageWidth = options.outWidth;
 
         final SeekBar seekbar=(SeekBar)findViewById(R.id.seekBar);
-        int width = (int) dipToPixels(this, 347);
-        int heigth = (int) dipToPixels(this, 434);
+        int width = 150;//(int) dipToPixels(this, 347);
+        int heigth = 150;//(int) dipToPixels(this, 434);
 
-        final Bitmap origin = Bitmap.createScaledBitmap( src, width , heigth, true);
-        final Bitmap result = Bitmap.createScaledBitmap( res, width , heigth, true);
+        //final Bitmap origin = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(pathI), width , heigth, true);
+        //final Bitmap result = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(pathR), width , heigth, true);
+
+        final Bitmap origin = decodeSampledBitmapFromPath(pathI, width, heigth);
+        final Bitmap result = decodeSampledBitmapFromPath(pathR, width, heigth);
 
         int minw = origin.getWidth();
         if(minw > result.getWidth())
@@ -155,6 +166,61 @@ public class ResultActivity2 extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
 
+    }
+
+    public static int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+
+        return inSampleSize;
+    }
+
+    public Bitmap decodeSampledBitmapFromPath(String path, int reqWidth,
+                                              int reqHeight) {
+
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(path, options);
+
+        options.inSampleSize = calculateInSampleSize(options, reqWidth,
+                reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        Bitmap bmp = BitmapFactory.decodeFile(path, options);
+        return bmp;
+    }
+
+    public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+                                                         int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeResource(res, resId, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeResource(res, resId, options);
     }
 
 }
