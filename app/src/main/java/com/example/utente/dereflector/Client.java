@@ -31,7 +31,7 @@ public class Client extends AsyncTask<Void, Void, String> {
 
     private final String dstAddress = "192.168.137.1"; // hotspot con pc, indirizzo gateway telefono
     private final int dstPort = 1234;
-    private String user = "none";
+    private String user;
     String response = "";
     String data;
     Bitmap img;
@@ -86,7 +86,6 @@ public class Client extends AsyncTask<Void, Void, String> {
                     response = "FALSE";
             }else if(flag == 2) {
                 String operation = "List";
-
                 oos.writeObject(operation);
                 oos.writeObject(user);
                 oos.flush();
@@ -101,7 +100,7 @@ public class Client extends AsyncTask<Void, Void, String> {
                 }
             }else if(flag == 3) {
                 oos.writeObject("getImage");
-                oos.writeObject("localhost");
+                oos.writeObject(user);
                 oos.writeObject(data);
 
                 byte[] obj = (byte[]) ois.readObject();
@@ -123,7 +122,7 @@ public class Client extends AsyncTask<Void, Void, String> {
                 ois.close();
             }else if(flag == 4) {
                 oos.writeObject("getResult");
-                oos.writeObject("localhost");
+                oos.writeObject(user);
                 oos.writeObject(data);
 
                 byte[] obj = (byte[]) ois.readObject();
@@ -144,7 +143,6 @@ public class Client extends AsyncTask<Void, Void, String> {
                 response = "TRUE";
             }else if(flag == 5) {
                 String operation = "ListNew";
-
                 oos.writeObject(operation);
                 oos.writeObject(user);
                 oos.flush();

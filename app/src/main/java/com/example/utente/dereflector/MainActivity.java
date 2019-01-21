@@ -125,21 +125,29 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ListImageActivity.class);
                 Log.v(TAG,"REQUEST SEND");
-
-                String result = "";
-                final Client myClient = new Client(getApplicationContext(),2,"", result);
                 try {
-                    result = myClient.execute().get();
-                } catch (ExecutionException e) {
-                    e.printStackTrace();
-                } catch (InterruptedException e) {
+                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RESULT_LOAD_IMAGE);
+                    } else {
+                        String result = "";
+                        final Client myClient = new Client(getApplicationContext(),2,"", result);
+                        try {
+                            result = myClient.execute().get();
+                        } catch (ExecutionException e) {
+                            e.printStackTrace();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+
+
+                        intent.putExtra("dataset",result);
+
+                        startActivity(intent);
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
-
-                intent.putExtra("dataset",result);
-
-                startActivity(intent);
 
             }
         });
