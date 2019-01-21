@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<shape
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/spashimg">
+    </item>
+</layer-list>
+<!--<shape
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:shape="rectangle">
     <stroke
@@ -14,4 +18,4 @@
         android:bottomLeftRadius="7dp"
         android:topLeftRadius="7dp"
         android:topRightRadius="7dp" />
-</shape>
+</shape>-->

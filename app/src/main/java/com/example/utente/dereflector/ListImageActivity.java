@@ -37,7 +37,7 @@ public class ListImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         ls = intent.getStringExtra("dataset");
-        if(ls==null)
+        if(ls==null || ls.equalsIgnoreCase("false"))
             ls="";
         else
             ls = ls.substring(1,ls.length()-1);
