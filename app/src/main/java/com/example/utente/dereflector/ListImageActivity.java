@@ -160,8 +160,9 @@ public class ListImageActivity extends AppCompatActivity {
         if(!fileI.exists()){
             Log.v(TAG,"IMAGE does not exist!");
             Client myClient = new Client(this,3, s, "");
+            myClient.execute();
             try {
-                res = myClient.execute().get();
+                res = myClient.get();
                 done1 = true;
             } catch (ExecutionException e) {
                 e.printStackTrace();
@@ -175,8 +176,9 @@ public class ListImageActivity extends AppCompatActivity {
         if(!fileR.exists()){
             Log.v(TAG,"RESULT does not exist!");
             Client myClient = new Client(this,4,s, "");
+            myClient.execute();
             try {
-                res = myClient.execute().get();
+                res = myClient.get();
                 done2 = true;
             } catch (ExecutionException e) {
                 e.printStackTrace();

@@ -135,8 +135,9 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         String result = "";
                         final Client myClient = new Client(getApplicationContext(),2,"", result);
+                        myClient.execute();
                         try {
-                            result = myClient.execute().get();
+                            result = myClient.get();
                         } catch (ExecutionException e) {
                             e.printStackTrace();
                         } catch (InterruptedException e) {
@@ -193,7 +194,8 @@ public class MainActivity extends AppCompatActivity {
         final String result = "";
         final Client myClient = new Client(this,1,picturePath, result);
         try {
-            if(myClient.execute().get()!=null) {
+            myClient.execute();
+            if(myClient.get()!=null) {
                 Toast.makeText(this, "Image Send!", Toast.LENGTH_LONG).show();
                 saveImage();
             }

@@ -140,8 +140,9 @@ public class BackgroundService extends IntentService {
         boolean done = false;
         String result = "";
         final Client myClient = new Client(CONTEXT,5,"", result);
+        myClient.execute();
         try {
-            result = myClient.execute().get();
+            myClient.get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
