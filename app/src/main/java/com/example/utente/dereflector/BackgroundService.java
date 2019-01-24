@@ -160,7 +160,6 @@ public class BackgroundService extends IntentService {
         for(int i = 0; i < ds.size(); i++){
             done = checkfile(ds.get(i));
             if(done){
-                Log.v(TAG,"aaaaaa");
                 return done;
             }
         }
@@ -177,11 +176,17 @@ public class BackgroundService extends IntentService {
 
         if(!fileI.exists()){
             Log.v(TAG,"IMAGE does not exist!");
+            final String result = "";
+            final Client myClient = new Client(this,3,s, result);
+            myClient.execute();
             return true;
         }
 
         if(!fileR.exists()){
             Log.v(TAG,"RESULT does not exist!");
+            final String result = "";
+            final Client myClient = new Client(this,3,s, result);
+            myClient.execute();
             return true;
         }
 
