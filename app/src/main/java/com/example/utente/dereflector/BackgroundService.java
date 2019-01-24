@@ -32,12 +32,12 @@ public class BackgroundService extends IntentService {
     private Handler mPeriodicEventHandler;
     private final int PERIODIC_EVENT_TIMEOUT = 5000;
     private Context CONTEXT;
-    String CHANNEL_ID = "prova";
+    String CHANNEL_ID = "NewImage";
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.icon)
             .setContentTitle("New Image!")
             .setContentText("A new image was elaborate!")
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+            .setPriority(2);
 
 
     @Override
@@ -85,7 +85,7 @@ public class BackgroundService extends IntentService {
         //startNotificationListener();
         super.onCreate();
         this.CONTEXT = this;
-            }
+    }
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
@@ -116,7 +116,7 @@ public class BackgroundService extends IntentService {
 
     public void PushNotification()
     {
-        Log.v(TAG,"NOTIFICA ");
+   /*     Log.v(TAG,"NOTIFICA ");
         Context context = getApplicationContext();
         NotificationManager nm = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
         Notification.Builder builder = new Notification.Builder(context);
@@ -133,8 +133,9 @@ public class BackgroundService extends IntentService {
 
         Notification notification = builder.build();
         nm.notify(id,notification);
-
+*/
     }
+
     private synchronized boolean checkNewFile(){
         boolean done = false;
         String result = "";
@@ -147,7 +148,7 @@ public class BackgroundService extends IntentService {
             e.printStackTrace();
         }
         Log.v(TAG,"List: "+result);
-        if(result ==null || result.length()<3){
+        if(result == null || result.length()<3){
             return false;
         }
         result = result.substring(1,result.length()-1);
@@ -159,6 +160,7 @@ public class BackgroundService extends IntentService {
         for(int i = 0; i < ds.size(); i++){
             done = checkfile(ds.get(i));
             if(done){
+                Log.v(TAG,"aaaaaa");
                 return done;
             }
         }

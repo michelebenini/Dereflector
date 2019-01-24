@@ -39,9 +39,12 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 import static java.security.AccessController.getContext;
@@ -49,7 +52,7 @@ import static java.security.AccessController.getContext;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
     private static final int RESULT_LOAD_IMAGE = 1;
-    private static final String CHANNEL_ID = "ChannelID";
+    private static final String CHANNEL_ID = "NewImage";
 
     String picturePath = "";
 
@@ -76,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        Log.d(TAG,"onCreate start!");
         createNotificationChannel();
         setContentView(R.layout.activity_main);
         ImageView add = findViewById(R.id.add);
@@ -191,18 +195,42 @@ public class MainActivity extends AppCompatActivity {
         try {
             if(myClient.execute().get()!=null) {
                 Toast.makeText(this, "Image Send!", Toast.LENGTH_LONG).show();
+                saveImage();
             }
-            else
+            else {
                 Toast.makeText(this, "Send error!",Toast.LENGTH_LONG).show();
+            }
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
+    private void saveImage(){
+        Bitmap img =  BitmapFactory.decodeFile(picturePath);
+        File dirImg = new File(Environment.getExternalStorageDirectory(), "Dereflection/Images/");
+        String name = new String();
+        Scanner scan = new Scanner(picturePath).useDelimiter("/");
+        while (scan.hasNext()) {
+            name = scan.next();
+        }
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        File file = new File(dirImg,name);
+        img.compress(Bitmap.CompressFormat.PNG, 50, stream);
+        byte[] buffer = stream.toByteArray();
 
+        if (file.exists ()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            out.write(buffer);
+            out.flush();
+            out.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) { // NOTE: with the implementation of this method inherited from // Activity, some widgets save their state in the bundle by default. // Once the user interface contains AT LEAST one non-autosaving // element, you should provide a custom implementation of // the method
         savedInstanceState.putString("image", picturePath);
@@ -212,9 +240,11 @@ public class MainActivity extends AppCompatActivity {
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
+        Log.d(TAG,"Build.VERSION.SDK_INT "+Build.VERSION.SDK_INT);
+        Log.d(TAG,"Build.VERSION_CODES.O "+ Build.VERSION_CODES.O);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = ("channelname");
-            String description = ("channelDescr");
+            CharSequence name = ("NewImage");
+            String description = ("Image ready to receive!");
             int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
             channel.setDescription(description);
@@ -222,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
+            Log.d(TAG,"Notification channel created!");
         }
     }
 

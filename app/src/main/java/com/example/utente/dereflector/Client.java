@@ -29,7 +29,7 @@ import java.util.Scanner;
 public class Client extends AsyncTask<Void, Void, String> {
     private final String TAG = "CLIENT";
 
-    private final String dstAddress = "192.168.137.1"; // hotspot con pc, indirizzo gateway telefono
+    private final String dstAddress = "192.168.30.12"; // hotspot con pc, indirizzo gateway telefono
     private final int dstPort = 1234;
     private String user;
     String response = "";
