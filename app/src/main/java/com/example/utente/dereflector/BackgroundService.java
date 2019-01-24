@@ -175,14 +175,14 @@ public class BackgroundService extends IntentService {
 
         if(!fileI.exists()){
             Log.v(TAG,"IMAGE does not exist!");
-            return false;
+            return true;
         }
 
         if(!fileR.exists()){
             Log.v(TAG,"RESULT does not exist!");
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 }

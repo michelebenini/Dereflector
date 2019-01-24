@@ -158,13 +158,14 @@ public class Client extends AsyncTask<Void, Void, String> {
             }
         } catch (UnknownHostException e) {
             // TODO Auto-generated catch block
+            response = null;
             e.printStackTrace();
-            response = "FALSE";
         } catch (IOException e) {
             // TODO Auto-generated catch block
+            response = null;
             e.printStackTrace();
-            response = "FALSE";
         } catch (ClassNotFoundException e) {
+            response = null;
             e.printStackTrace();
         } finally {
             if (socket != null) {
