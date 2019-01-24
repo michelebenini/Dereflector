@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         final String result = "";
         final Client myClient = new Client(this,1,picturePath, result);
         try {
-            if(myClient.execute().get().compareTo("TRUE")==0) {
+            if(myClient.execute().get()!=null) {
                 Toast.makeText(this, "Image Send!", Toast.LENGTH_LONG).show();
             }
             else

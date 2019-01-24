@@ -56,8 +56,8 @@ public class ResultActivity extends AppCompatActivity {
         int imageWidth = options.outWidth;
 
         final SeekBar seekbar=(SeekBar)findViewById(R.id.seekBar);
-        int width = 150;//(int) dipToPixels(this, 347);
-        int heigth = 150;//(int) dipToPixels(this, 434);
+        int width = 300;//(int) dipToPixels(this, 347);
+        int heigth = 300;//(int) dipToPixels(this, 434);
 
         //final Bitmap origin = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(pathI), width , heigth, true);
         //final Bitmap result = Bitmap.createScaledBitmap(BitmapFactory.decodeFile(pathR), width , heigth, true);

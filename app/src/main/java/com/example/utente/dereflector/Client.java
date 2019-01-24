@@ -56,7 +56,7 @@ public class Client extends AsyncTask<Void, Void, String> {
         Log.v(TAG,"Do in background Server: "+dstAddress+":"+dstPort);
         try {
             socket = new Socket();
-            socket.connect(new InetSocketAddress(dstAddress, dstPort), 1000);
+            socket.connect(new InetSocketAddress(dstAddress, dstPort), 2000);
             //socket.setSoTimeout(1000);
             Log.v(TAG,"Socket created");
 
@@ -71,7 +71,7 @@ public class Client extends AsyncTask<Void, Void, String> {
                 }
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 img =  BitmapFactory.decodeFile(data);
-                img.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                img.compress(Bitmap.CompressFormat.PNG, 50, stream);
                 byte[] buffer = stream.toByteArray();
 
                 oos.writeObject(operation);
