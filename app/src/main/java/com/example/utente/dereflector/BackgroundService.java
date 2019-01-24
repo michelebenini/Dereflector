@@ -1,29 +1,18 @@
 package com.example.utente.dereflector;
 
-import android.app.Application;
 import android.app.IntentService;
-import android.app.ListActivity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.JobIntentService;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
-import android.widget.Toast;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
-
-import javax.xml.transform.Result;
 
 
 public class BackgroundService extends IntentService {
@@ -82,17 +71,8 @@ public class BackgroundService extends IntentService {
 
     @Override
     public void onCreate() {
-        //startNotificationListener();
         super.onCreate();
         this.CONTEXT = this;
-    }
-
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        //Intent restartServiceIntent = new Intent(getApplicationContext(),this.getClass());
-        //restartServiceIntent.setPackage(getPackageName());
-        //startService(restartServiceIntent);
-        //super.onTaskRemoved(rootIntent);
     }
 
     @Override
@@ -101,48 +81,13 @@ public class BackgroundService extends IntentService {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    public void startNotificationListener() {
-        //start's a new thread
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //fetching notifications from server
-                //if there is notifications then call this method
-                PushNotification();
-
-            }
-        }).start();
-    }
-
-    public void PushNotification()
-    {
-   /*     Log.v(TAG,"NOTIFICA ");
-        Context context = getApplicationContext();
-        NotificationManager nm = (NotificationManager)context.getSystemService(NOTIFICATION_SERVICE);
-        Notification.Builder builder = new Notification.Builder(context);
-        Intent notificationIntent = new Intent(context, ListActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(context,0,notificationIntent,0);
-
-        //set
-        builder.setContentIntent(contentIntent);
-        builder.setSmallIcon(R.drawable.icon);
-        builder.setContentText("Contents");
-        builder.setContentTitle("title");
-        builder.setAutoCancel(true);
-        builder.setDefaults(Notification.DEFAULT_ALL);
-
-        Notification notification = builder.build();
-        nm.notify(id,notification);
-*/
-    }
-
     private synchronized boolean checkNewFile(){
         boolean done = false;
         String result = "";
         final Client myClient = new Client(CONTEXT,5,"", result);
         myClient.execute();
         try {
-            myClient.get();
+            result = myClient.get();
         } catch (ExecutionException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
@@ -177,17 +122,34 @@ public class BackgroundService extends IntentService {
 
         if(!fileI.exists()){
             Log.v(TAG,"IMAGE does not exist!");
-            final String result = "";
+            String result = "";
             final Client myClient = new Client(this,3,s, result);
             myClient.execute();
+
+            try {
+                result = myClient.get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             return true;
         }
 
         if(!fileR.exists()){
             Log.v(TAG,"RESULT does not exist!");
-            final String result = "";
+            String result = "";
             final Client myClient = new Client(this,3,s, result);
             myClient.execute();
+            try {
+                result = myClient.get();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             return true;
         }
 

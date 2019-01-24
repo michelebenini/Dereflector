@@ -1,17 +1,9 @@
 package com.example.utente.dereflector;
 
 import android.Manifest;
-import android.accounts.Account;
-import android.accounts.AccountManager;
-import android.app.AlarmManager;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -19,15 +11,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Handler;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.JobIntentService;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,19 +20,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-
-
 import com.squareup.picasso.Picasso;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
-
-import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "DEBUG";
@@ -93,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         if(savedInstanceState != null){
             picturePath = savedInstanceState.getString("image");
-            ImageView imageView = (ImageView) findViewById(R.id.add);
+            ImageView imageView =  findViewById(R.id.add);
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
 
             if(imageView.getDrawable() != null){
@@ -175,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
             picturePath = cursor.getString(columnIndex);
             cursor.close();
 
-            ImageView imageView = (ImageView) findViewById(R.id.add);
+            ImageView imageView = findViewById(R.id.add);
 
             Picasso.get().load("file://" + picturePath).resize(imageView.getMeasuredWidth(), imageView.getMeasuredHeight()).centerCrop().into(imageView);
             //imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));

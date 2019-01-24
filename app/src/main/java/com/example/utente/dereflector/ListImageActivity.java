@@ -1,7 +1,5 @@
 package com.example.utente.dereflector;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.content.Intent;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -9,18 +7,11 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
-import static java.lang.Thread.sleep;
 
 
 public class ListImageActivity extends AppCompatActivity {
@@ -50,7 +41,7 @@ public class ListImageActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        mRecyclerView = (RecyclerView) findViewById(R.id.listview);
+        mRecyclerView =  findViewById(R.id.listview);
 
 
         // use this setting to improve performance if you know that changes
@@ -65,7 +56,6 @@ public class ListImageActivity extends AppCompatActivity {
         final ArrayList<String> dataset = makeDataset();
 
         mAdapter = new ListAdapter(ListImageActivity.this,dataset);
-
         mRecyclerView.setAdapter(mAdapter);
 
         new Thread(new Runnable() {
@@ -99,8 +89,6 @@ public class ListImageActivity extends AppCompatActivity {
 
 
                 }
-
-                //mAdapter.notifyDataSetChanged();
             }
 
         }).start();
@@ -113,13 +101,6 @@ public class ListImageActivity extends AppCompatActivity {
         while(scan.hasNext()){
             ds.add(scan.next());
         }
-        int n = ds.size();
-
-        for (int i = 0; i < n; i++){
-            String str = ds.get(i);
-
-            //checkfile(str);
-        }
 
         String pathI = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Images/";
         File directoryI = new File(pathI);
@@ -127,20 +108,14 @@ public class ListImageActivity extends AppCompatActivity {
         String pathR = Environment.getExternalStorageDirectory().toString()+"/Dereflection/Result/";
         File directoryR = new File(pathR);
         File[] filesR = directoryR.listFiles();
-        int f = filesI.length;
-        if(f > filesR.length) {
-            f = filesR.length;
-        }
 
         ArrayList<String> dataset = new ArrayList<>();
-        int k = 0;
         for (int i = 0; i < filesI.length; i++)
         {
             for (int j = 0; j < filesR.length; j++) {
                 if (filesI[i].getName().compareTo(filesR[j].getName()) == 0) {
                     Log.d(TAG, "Images: " + filesI[i].getName() + " Result: " + filesR[j].getName());
                     dataset.add(filesI[i].getName());
-                    k++;
                 }
             }
         }
@@ -190,7 +165,7 @@ public class ListImageActivity extends AppCompatActivity {
         }
 
         Log.v(TAG,"done 1 : "+done1+" done 2 "+done2);
-        return done1&done2;
+        return done1|done2;
     }
 
 }

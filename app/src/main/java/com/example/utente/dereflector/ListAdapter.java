@@ -33,8 +33,8 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
             super(v);
 
 
-            mTextView = (TextView) v.findViewById(R.id.textView1);
-            imView = (ImageView)v.findViewById(R.id.imageView1);
+            mTextView = v.findViewById(R.id.textView1);
+            imView = v.findViewById(R.id.imageView1);
         }
 
 
@@ -50,7 +50,6 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
     @Override
     public ListAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // create a new view
-        MyViewHolder holder;
         View v =  LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_view_item, parent, false);
 
         MyViewHolder vh = new MyViewHolder(v);
