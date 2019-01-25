@@ -11,10 +11,14 @@ import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetSocketAddress;
@@ -29,7 +33,7 @@ import java.util.Scanner;
 public class Client extends AsyncTask<Void, Void, String> {
     private final String TAG = "CLIENT";
 
-    private final String dstAddress = "192.168.30.11"; // hotspot con pc, indirizzo gateway telefono
+    private String dstAddress = "192.168.30.11"; // hotspot con pc, indirizzo gateway telefono
     private final int dstPort = 1234;
     private String user;
     String response = "";
@@ -46,6 +50,36 @@ public class Client extends AsyncTask<Void, Void, String> {
         this.data = data;
         this.result = result;
         this.user = getUser();
+        this.dstAddress = getHost(context);
+    }
+    private String getHost(Context context) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput("config.txt");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+        Log.v(TAG,"s : " +ret);
+        return ret;
     }
     private String getUser(){
        return "Jane.Doe";

@@ -35,8 +35,8 @@ public class ResultActivity extends AppCompatActivity {
         BitmapFactory.decodeResource(getResources(), R.id.img, options);
 
         final SeekBar seekbar=findViewById(R.id.seekBar);
-        int width = 300;//(int) dipToPixels(this, 347);
-        int heigth = 300;//(int) dipToPixels(this, 434);
+        int width = 300;
+        int heigth = 300;
         final Bitmap origin = Bitmap.createScaledBitmap(decodeSampledBitmapFromPath(pathI, width, heigth), width, heigth, false);
         final Bitmap result = Bitmap.createScaledBitmap(decodeSampledBitmapFromPath(pathR, width, heigth), width, heigth, false);
 

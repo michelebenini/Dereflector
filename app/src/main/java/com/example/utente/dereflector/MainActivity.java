@@ -3,6 +3,7 @@ package com.example.utente.dereflector;
 import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -18,12 +19,21 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.squareup.picasso.Picasso;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
@@ -57,12 +67,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
         Log.d(TAG,"onCreate start!");
         createNotificationChannel();
         setContentView(R.layout.activity_main);
         ImageView add = findViewById(R.id.add);
         Button send = findViewById(R.id.send);
         Button show = findViewById(R.id.show);
+
 
         Intent mServiceIntent =  new Intent();
         mServiceIntent.setClass(this, BackgroundService.class);
@@ -73,6 +85,9 @@ public class MainActivity extends AppCompatActivity {
             picturePath = savedInstanceState.getString("image");
             ImageView imageView =  findViewById(R.id.add);
             imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            String h = getHost(getApplicationContext());
+            TextView host = findViewById(R.id.host);
+            host.setText(h);
 
             if(imageView.getDrawable() != null){
                 send = findViewById(R.id.send);
@@ -83,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
                 Log.v(TAG, "Click on image!");
-
+                setHost(getApplicationContext());
                 try {
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RESULT_LOAD_IMAGE);
@@ -99,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         send.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                setHost(getApplicationContext());
                 request();
             }
         });
@@ -107,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, ListImageActivity.class);
                 Log.v(TAG,"REQUEST SEND");
+                setHost(getApplicationContext());
                 try {
                     if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                         ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, RESULT_LOAD_IMAGE);
@@ -187,6 +204,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void setHost(Context context){
+        EditText host = findViewById(R.id.host);
+        String s =host.getText().toString();
+        Log.v(TAG,"s : "+s);
+        try {
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput("config.txt", Context.MODE_PRIVATE));
+            outputStreamWriter.write(s);
+            outputStreamWriter.close();
+        }
+        catch (IOException e) {
+            Log.e("Exception", "File write failed: " + e.toString());
+        }
+
+    }
+    private String getHost(Context context) {
+
+        String ret = "";
+
+        try {
+            InputStream inputStream = context.openFileInput("config.txt");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+                StringBuilder stringBuilder = new StringBuilder();
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) {
+                    stringBuilder.append(receiveString);
+                }
+
+                inputStream.close();
+                ret = stringBuilder.toString();
+            }
+        }
+        catch (FileNotFoundException e) {
+            Log.e("login activity", "File not found: " + e.toString());
+        } catch (IOException e) {
+            Log.e("login activity", "Can not read file: " + e.toString());
+        }
+        Log.v(TAG,"s : " +ret);
+        return ret;
+    }
     private void saveImage(){
         Bitmap img =  BitmapFactory.decodeFile(picturePath);
         File dirImg = new File(Environment.getExternalStorageDirectory(), "Dereflection/Images/");
@@ -214,6 +274,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) { // NOTE: with the implementation of this method inherited from // Activity, some widgets save their state in the bundle by default. // Once the user interface contains AT LEAST one non-autosaving // element, you should provide a custom implementation of // the method
         savedInstanceState.putString("image", picturePath);
+        setHost(getApplicationContext());
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -236,7 +297,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        setHost(getApplicationContext());
+    }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        String h = getHost(getApplicationContext());
+        TextView host = findViewById(R.id.host);
+        host.setText(h);
+    }
 }
 
